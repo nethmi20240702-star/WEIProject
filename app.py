@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+st.set_page_config(page_title="Water Dashboard", layout="wide")
 
 # Title
 st.title("Water Exploitation Dashboard")
@@ -42,8 +43,37 @@ col1.metric("Avg WEI (%)", avg_wei)
 col2.metric("Total Consumption", total_consumption)
 col3.metric("Total Abstraction", total_abstraction)
 
+# Calculate country average (all years)
+country_avg = round(
+    df[df["Country"] == country]["WEI"].mean(), 2
+)
+
+# Calculate global average
+global_avg = round(df["WEI"].mean(), 2)
+
+# Compare 
+if country_avg > global_avg:
+    comparison = "above the global average"
+else:
+    comparison = "below the global average"
+
+if country_avg < global_avg * 0.8:
+    level = "Low water stress"
+elif country_avg < global_avg * 1.2:
+    level = "Moderate water stress"
+else:
+    level = "High water stress"
+
+col4, col5 = st.columns(2)
+col4.metric("Country Avg WEI", country_avg)
+col5.metric("Global Avg WEI", global_avg)
+
 # Insight
-st.info(f"In {year}, {country} has WEI of {avg_wei}%. Higher WEI indicates water stress.")
+st.info(
+    f"Insight: In {year}, {country} records a WEI of {avg_wei}%. "
+    f"The country's long-term average is {country_avg}%, which is {comparison} ({global_avg}%). "
+    f"This suggests **{level}**, highlighting its relative position compared to global water stress patterns."
+)
 
 # Line chart
 st.subheader("WEI Trend Over Time")
@@ -58,15 +88,16 @@ fig_line = px.line(
     x="Year",
     y="WEI",
     title="WEI Trend",
-    markers=True
+    markers=True,
+    color_discrete_sequence=["#1f77b4"]
 )
 
 st.plotly_chart(fig_line)
 
-# Bar chart 
+# Bar chart
 st.subheader("Quarterly Water Consumption")
 
-# Filter only by country and year (NOT quarter)
+# Filter only by country and year
 bar_df = df[(df["Country"] == country) & (df["Year"] == year)]
 
 fig_bar = px.bar(
@@ -74,10 +105,15 @@ fig_bar = px.bar(
     x="Quarter",
     y="Water_Consumption",
     title="Water Consumption by Quarter",
-    color="Quarter"   
+    color="Quarter",
+      
 )
 
 st.plotly_chart(fig_bar)
+
+if filtered_df.empty:
+    st.warning("No data available for selected filters.")
+    st.stop()
 
 # Bar chart 
 st.subheader("Top 10 Countries by WEI")
