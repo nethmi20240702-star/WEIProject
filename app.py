@@ -31,7 +31,7 @@ filtered_df = df[(df["Country"] == country) &
                  (df["Quarter"] == quarter)]
 
 
-# KPI 
+# KPI styling
 st.markdown("""
 <style>
 .kpi-box {
@@ -64,7 +64,6 @@ avg_wei = round(filtered_df["WEI"].mean(), 2)
 total_consumption = int(filtered_df["Water_Consumption"].sum())
 total_abstraction = int(filtered_df["Water_Abstraction"].sum())
 
-
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -91,7 +90,6 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
 
-
 country_avg = round(df[df["Country"] == country]["WEI"].mean(), 2)
 global_avg = round(df["WEI"].mean(), 2)
 
@@ -112,7 +110,6 @@ with col5:
         <div class="kpi-value">{global_avg}</div>
     </div>
     """, unsafe_allow_html=True)
-
 
 # Compare 
 if country_avg > global_avg:
@@ -179,7 +176,7 @@ if filtered_df.empty:
     st.warning("No data available for selected filters.")
     st.stop()
 
-# Bar chart
+# Bar chart (Top 10 Countries by WEI)
 st.subheader("Top 10 Countries by WEI") 
 top_df = df[df["Year"] == year].groupby("Country")["WEI"].mean().reset_index()
 
