@@ -30,26 +30,89 @@ filtered_df = df[(df["Country"] == country) &
                  (df["Year"] == year) &
                  (df["Quarter"] == quarter)]
 
-# KPI
+
+# KPI 
+st.markdown("""
+<style>
+.kpi-box {
+    border: 2px solid #1f77b4;  /* Blue border */
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    background-color: #0e1117;
+    margin-bottom: 10px;
+}
+
+.kpi-title {
+    font-size: 14px;
+    color: #9aa0a6;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffffff;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 st.subheader("Key Performance Indicators")
 
+# Calculate KPIs
 avg_wei = round(filtered_df["WEI"].mean(), 2)
 total_consumption = int(filtered_df["Water_Consumption"].sum())
 total_abstraction = int(filtered_df["Water_Abstraction"].sum())
 
+
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Avg WEI (%)", avg_wei)
-col2.metric("Total Consumption", total_consumption)
-col3.metric("Total Abstraction", total_abstraction)
+with col1:
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-title">Avg WEI (%)</div>
+        <div class="kpi-value">{avg_wei}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Calculate country average (all years)
-country_avg = round(
-    df[df["Country"] == country]["WEI"].mean(), 2
-)
+with col2:
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-title">Total Consumption</div>
+        <div class="kpi-value">{total_consumption}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Calculate global average
+with col3:
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-title">Total Abstraction</div>
+        <div class="kpi-value">{total_abstraction}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+country_avg = round(df[df["Country"] == country]["WEI"].mean(), 2)
 global_avg = round(df["WEI"].mean(), 2)
+
+col_space1, col4, col5, col_space2 = st.columns([1, 2, 2, 1])
+
+with col4:
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-title">Country Avg WEI</div>
+        <div class="kpi-value">{country_avg}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col5:
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-title">Global Avg WEI</div>
+        <div class="kpi-value">{global_avg}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 # Compare 
 if country_avg > global_avg:
@@ -64,9 +127,6 @@ elif country_avg < global_avg * 1.2:
 else:
     level = "High water stress"
 
-col4, col5 = st.columns(2)
-col4.metric("Country Avg WEI", country_avg)
-col5.metric("Global Avg WEI", global_avg)
 
 # Insight
 st.info(
@@ -97,7 +157,6 @@ st.plotly_chart(fig_line)
 # Bar chart
 st.subheader("Quarterly Water Consumption")
 
-# Filter only by country and year
 bar_df = df[(df["Country"] == country) & (df["Year"] == year)]
 
 fig_bar = px.bar(
@@ -105,8 +164,13 @@ fig_bar = px.bar(
     x="Quarter",
     y="Water_Consumption",
     title="Water Consumption by Quarter",
-    color="Quarter",
-      
+    color="Water_Consumption",
+    color_continuous_scale="Blues"
+)
+
+fig_bar.update_layout(
+    xaxis_title="Quarter",
+    yaxis_title="Water Consumption"
 )
 
 st.plotly_chart(fig_bar)
@@ -115,9 +179,8 @@ if filtered_df.empty:
     st.warning("No data available for selected filters.")
     st.stop()
 
-# Bar chart 
-st.subheader("Top 10 Countries by WEI")
-
+# Bar chart
+st.subheader("Top 10 Countries by WEI") 
 top_df = df[df["Year"] == year].groupby("Country")["WEI"].mean().reset_index()
 
 fig_bar2 = px.bar(
@@ -126,7 +189,13 @@ fig_bar2 = px.bar(
     y="WEI",
     title="Top Countries by WEI",
     color="WEI",
-    color_continuous_scale="Blues"
+    color_continuous_scale="Blues",
+    text="WEI"  
+)
+
+fig_bar2.update_traces(
+    textposition="outside",
+    texttemplate='%{text:.2f}' 
 )
 
 st.plotly_chart(fig_bar2)
