@@ -40,16 +40,19 @@ This project presents an interactive data dashboard developed using Streamlit to
 - NumPy
 - Matplotlib
 
-## How to Run the App Locally
 
-Navigate to the folder:
+## How to Run the Project
+
+### 1. Clone the Repository
+git clone https://github.com/nethmi20240702-star/WEIProject.git
 cd WEIProject
 
-Install dependencies:
+### 2. Install Required Libraries
 pip install -r requirements.txt
 
-Run the app:
+### 3. Run the Application
 streamlit run app.py
+
 
 ## Live Application
 https://weiproject.streamlit.app/
